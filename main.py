@@ -10,8 +10,8 @@ import re
 import nltk
 import json
 import torch
-from torch.utils.data import Dataset
-from transformers import pipeline, DistilBertTokenizerFast, Trainer, TrainingArguments, AutoModelForSequenceClassification
+# from torch.utils.data import Dataset
+# from transformers import pipeline, DistilBertTokenizerFast, Trainer, TrainingArguments, AutoModelForSequenceClassification
 
 # Preprocessing Variables
 rows = 536
@@ -119,45 +119,45 @@ def analyze_bag(df):
     #    val = len(df[df["count"] == n])
     #    print(str(n) + "-occurrence:", val, "(" + str(round(val/total*100, 2)) + "%)")
 
-
-def neuralnet():
-    device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
-    numeric = preprocess_data(np_type="numeric")
-    text = preprocess_data(np_type="text")
-
-    model_id = "distilbert-base-uncased-finetuned-sst-2-english"
-    # model = pipeline("text-classification", model=model_id)
-    model = AutoModelForSequenceClassification.from_pretrained(model_id)
-    # model.to(device)
-    tokenizer = DistilBertTokenizerFast.from_pretrained(model_id)
-
-    def tokenize_function(examples):
-        return tokenizer(examples, padding="max_length", truncation=True)
-
-    text = text.map(tokenize_function)
-
-    train_text, train_label = text[:535], numeric[:535, :]
-    test_text, test_label = text[536:], numeric[536:, :]
-    # train_encodings = tokenizer(train_text)
-    # test_encodings = tokenizer(test_text)
-
-    trainset = LIWCDataset(train_text, train_label)
-    testset = LIWCDataset(test_text, test_label)
-
-    training_args = TrainingArguments("test_trainer")
-
-    trainer = Trainer(
-        args=training_args,
-        model=model,
-        train_dataset=trainset,
-        eval_dataset=testset
-    )
-
-    trainer.train()
-    trainer.evaluate()
-    results = model(text)
-    print(results)
-    return model
+## not used:
+# def neuralnet():
+#    device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
+#    numeric = preprocess_data(np_type="numeric")
+#    text = preprocess_data(np_type="text")
+#
+#    model_id = "distilbert-base-uncased-finetuned-sst-2-english"
+#    # model = pipeline("text-classification", model=model_id)
+#    model = AutoModelForSequenceClassification.from_pretrained(model_id)
+#    # model.to(device)
+#    tokenizer = DistilBertTokenizerFast.from_pretrained(model_id)
+#
+#    def tokenize_function(examples):
+#        return tokenizer(examples, padding="max_length", truncation=True)
+#
+#    text = text.map(tokenize_function)
+#
+#    train_text, train_label = text[:535], numeric[:535, :]
+#    test_text, test_label = text[536:], numeric[536:, :]
+#    # train_encodings = tokenizer(train_text)
+#    # test_encodings = tokenizer(test_text)
+#
+#    trainset = LIWCDataset(train_text, train_label)
+#    testset = LIWCDataset(test_text, test_label)
+#
+#    training_args = TrainingArguments("test_trainer")
+#
+#    trainer = Trainer(
+#        args=training_args,
+#        model=model,
+#        train_dataset=trainset,
+#        eval_dataset=testset
+#    )
+#
+#    trainer.train()
+#    trainer.evaluate()
+#    results = model(text)
+#    print(results)
+#    return model
 
 
 if __name__ == '__main__':
@@ -166,9 +166,6 @@ if __name__ == '__main__':
     # data = preprocess_data(rows, numeric=True)
     # bag_data = bag_of_words(data, save=False, valuefield="Q5Mean", textfield2="Q7")
     # analyze_bag(bag_data)
-
-    # # neural network method
-    # model = neuralnet()
 
     # # GoFundMe Data
     # gfm_data = pd.read_csv("DATA/scraped_links.csv")
